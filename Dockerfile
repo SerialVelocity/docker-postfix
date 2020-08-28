@@ -1,4 +1,4 @@
-FROM debian:stable-slim AS build
+FROM debian:stable-slim AS postfix
 
 ARG POSTFIX_VERSION
 
@@ -21,13 +21,26 @@ RUN cd "/postfix-${POSTFIX_VERSION}" && \
 
 
 
+FROM debian:stable-slim AS s6-overlay
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates wget && \
+    apt-get clean
+
+RUN mkdir /pkg && \
+    wget -qO- https://github.com/just-containers/s6-overlay/releases/download/v1.21.8.0/s6-overlay-amd64.tar.gz | tar xvz -C /pkg && \
+    wget -qO- https://github.com/just-containers/socklog-overlay/releases/download/v3.1.0-2/socklog-overlay-amd64.tar.gz | tar xvz -C /pkg
+
+
+
 FROM debian:stable-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libc6 libdb5.3 libicu63 libldap-2.4-2 libpcre3 libsasl2-2 libssl1.1 netbase tini && \
+    apt-get install -y --no-install-recommends libc6 libdb5.3 libicu63 libldap-2.4-2 libpcre3 libsasl2-2 libssl1.1 netbase && \
     apt-get clean
 
-COPY --from=build /pkg/ /
+COPY --from=postfix /pkg/ /
+COPY --from=s6-overlay /pkg/ /
 
 RUN groupadd -g 9991 postfix && \
     groupadd -g 9992 postdrop && \
@@ -35,5 +48,7 @@ RUN groupadd -g 9991 postfix && \
 
 RUN postfix set-permissions upgrade-configuration mail_owner=postfix setgid_group=postdrop
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["/usr/sbin/postfix", "start-fg"]
+COPY rootfs/ /
+
+ENTRYPOINT ["/init"]
+CMD ["postfix", "start-fg"]
