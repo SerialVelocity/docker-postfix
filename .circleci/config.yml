@@ -17,7 +17,7 @@ jobs:
           set -euo pipefail
 
           ALL_TAGS=$(git ls-remote -q --tags --refs postfix | sed -nE 's#^[0-9a-f]{40}\trefs/tags/v([0-9]+\.[0-9]+\.[0-9]+)$#\1#p')
-          LATEST_MINOR_VERSIONS=$(echo "${ALL_TAGS}" | sed -E 's#^([0-9]+\.[0-9]+)\.[0-9]+$#\1#' | sort -V -u | tail -n 3)
+          LATEST_MINOR_VERSIONS=$(echo "${ALL_TAGS}" | sed -E 's#^([0-9]+\.[0-9]+)\.[0-9]+$#\1#' | sort -r -V -u | head -n 3)
 
           for MINOR_VERSION in ${LATEST_MINOR_VERSIONS}; do
             LATEST_TAG_FOR_MINOR_VERSION=$(echo "${ALL_TAGS}" | grep '^'"${MINOR_VERSION}"'\.' | sort -V | tail -n 1)

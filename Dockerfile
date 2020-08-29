@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates wget && \
     apt-get clean
 
-RUN wget -qO- "http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-${POSTFIX_VERSION}.tar.gz" | tar xvz
+RUN wget -qO- "http://cdn.postfix.johnriley.me/mirrors/postfix-release/official/postfix-${POSTFIX_VERSION}.tar.gz" | tar xz
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc icu-devtools libc6-dev libdb-dev libicu-dev libldap2-dev libpcre3-dev libsasl2-dev libssl-dev m4 make pkg-config && \
