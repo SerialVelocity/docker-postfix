@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get clean
 
 RUN cd "/postfix-${POSTFIX_VERSION}" && \
-    make makefiles pie=yes shared=yes dynamicmaps=yes CCARGS='-DHAS_LDAP -DHAS_PCRE -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl -DDEF_SERVER_SASL_TYPE=\"dovecot\" -DUSE_TLS' AUXLIBS="-lssl -lcrypto -lsasl2" && \
+    make makefiles pie=yes shared=yes dynamicmaps=yes CCARGS='-DHAS_LDAP -DHAS_PCRE -DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I/usr/include/sasl -DDEF_SERVER_SASL_TYPE=\"dovecot\" -DUSE_TLS' AUXLIBS="-lssl -lcrypto -lsasl2" AUXLIBS_LDAP="-lldap -llber" AUXLIBS_PCRE="$(pcre-config --libs)" && \
     make -j5
 
 RUN cd "/postfix-${POSTFIX_VERSION}" && \
