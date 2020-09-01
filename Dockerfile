@@ -36,7 +36,7 @@ RUN mkdir /pkg && \
 FROM debian:stable-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libc6 libdb5.3 libicu63 libldap-2.4-2 libpcre3 libsasl2-2 libssl1.1 netbase && \
+    apt-get install -y --no-install-recommends libc6 libdb5.3 libicu63 libldap-2.4-2 libpcre3 libsasl2-2 libsasl2-modules libsasl2-modules-ldap libssl1.1 netbase sasl2-bin && \
     apt-get clean
 
 COPY --from=postfix /pkg/ /
@@ -44,7 +44,7 @@ COPY --from=s6-overlay /pkg/ /
 
 RUN groupadd -g 9991 postfix && \
     groupadd -g 9992 postdrop && \
-    useradd -u 9991 -d /var/spool/postfix -g postfix -s /bin/false postfix
+    useradd -u 9991 -d /var/spool/postfix -g postfix -G sasl -s /bin/false postfix
 
 RUN postfix set-permissions upgrade-configuration mail_owner=postfix setgid_group=postdrop
 

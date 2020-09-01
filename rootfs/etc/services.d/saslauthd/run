@@ -1,0 +1,2 @@
+#!/usr/bin/with-contenv bash
+exec saslauthd -a "${SASL_AUTH_MECHANISM:-ldap}" -r -d -O /etc/saslauthd/saslauthd.conf
