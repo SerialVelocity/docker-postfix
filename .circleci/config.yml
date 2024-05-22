@@ -24,6 +24,25 @@ jobs:
             git tag --force "${LATEST_TAG_FOR_MINOR_VERSION}" HEAD
             git push --force origin "${LATEST_TAG_FOR_MINOR_VERSION}"
           done
+  publish:
+    docker:
+    - image: alpine:latest
+    steps:
+    - setup_remote_docker:
+          docker_layer_caching: false
+    - run:
+        name: Install dependencies
+        command: apk add --no-cache bash git docker-cli
+    - checkout
+    - run:
+        name: Docker Login
+        command: docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+    - run:
+        name: Docker Build
+        command: docker build --no-cache --build-arg "POSTFIX_VERSION=${CIRCLE_TAG}" --tag "${DOCKER_REPO}:${CIRCLE_TAG}" .
+    - run:
+        name: Docker Push
+        command: scripts/push-version-tags.sh
 workflows:
   version: 2
   setup_repo_tags:
@@ -42,4 +61,14 @@ workflows:
         filters:
           branches:
             only:
-              master
+            - master
+  publish:
+    jobs:
+    - publish:
+        filters:
+          tags:
+            only:
+            - /.*/
+          branches:
+            ignore:
+            - /.*/
