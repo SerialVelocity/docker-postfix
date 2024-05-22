@@ -32,7 +32,7 @@ jobs:
           docker_layer_caching: false
     - run:
         name: Install dependencies
-        command: apk add --no-cache bash git docker-cli
+        command: apk add --no-cache bash git openssh-client docker-cli
     - checkout
     - run:
         name: Docker Login
